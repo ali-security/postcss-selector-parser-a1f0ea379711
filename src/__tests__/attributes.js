@@ -450,8 +450,11 @@ test('comment after insensitive(space before)', '[href="foo" i /**/]', (t, tree)
 });
 
 const testDeprecation = nodeVersionAtLeast('7.0.0') || nodeVersionBefore('6.0.0') ? test : test.skip;
+// Node >= 16 throws DeprecationWarning on process.nextTick rather than synchronously,
+// so t.throws() cannot observe it there.
+const testThrowsDeprecation = nodeVersionAtLeast('16.0.0') ? test.skip : testDeprecation;
 
-testDeprecation('deprecated constructor', '', (t) => {
+testThrowsDeprecation('deprecated constructor', '', (t) => {
     t.throws(
         () => {
             return new Attribute({value: '"foo"', attribute: "data-bar"});
@@ -460,7 +463,7 @@ testDeprecation('deprecated constructor', '', (t) => {
     );
 });
 
-testDeprecation('deprecated get of raws.unquoted ', '', (t) => {
+testThrowsDeprecation('deprecated get of raws.unquoted ', '', (t) => {
     t.throws(
         () => {
             let attr = new Attribute({value: 'foo', quoteMark: '"', attribute: "data-bar"});
@@ -470,7 +473,7 @@ testDeprecation('deprecated get of raws.unquoted ', '', (t) => {
     );
 });
 
-testDeprecation('deprecated set of raws.unquoted ', '', (t) => {
+testThrowsDeprecation('deprecated set of raws.unquoted ', '', (t) => {
     t.throws(
         () => {
             let attr = new Attribute({value: 'foo', quoteMark: '"', attribute: "data-bar"});
